@@ -57,14 +57,14 @@ function New-Resource {
     try
     {
 
-        Set-CalendarProcessing -Identity $windowsLiveID -ResourceDelegates $groupLiveID -BookInPolicy $groupLiveID -AutomateProcessing AutoAccept -ForwardRequestsToDelegates $true -TentativePendingApproval $true -AllowRecurringMeetings $true -AllowConflicts $true -AllBookInPolicy $false -AllRequestInPolicy $true -AllRequestOutOfPolicy $false  -DeleteSubject $false -AddOrganizerToSubject $false
+        Set-CalendarProcessing -Identity $windowsLiveID -ResourceDelegates $groupLiveID -BookInPolicy $groupLiveID -AutomateProcessing AutoAccept -ForwardRequestsToDelegates $true -TentativePendingApproval $true -AllowRecurringMeetings $true -AllowConflicts $true -AllBookInPolicy $false -AllRequestInPolicy $true -AllRequestOutOfPolicy $false  -DeleteSubject $false -AddOrganizerToSubject $false -ErrorAction "Stop"
         Write-Output "Calendar Processing Set"
         $i = 10;
     }
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Calendar Processing - Sleep Timer Started - On $i th iteration of 15 second breaks."
+        Write-Output "Calendar Processing - Sleep Timer Started - On $i th iteration of a 15 second break."
         $i++;
         $retry_calproc = "Set-CalendarProcessing -Identity $windowsLiveID -ResourceDelegates $groupLiveID -BookInPolicy $groupLiveID -AutomateProcessing AutoAccept -ForwardRequestsToDelegates $true -TentativePendingApproval $true -AllowRecurringMeetings $true -AllowConflicts $true -AllBookInPolicy $false -AllRequestInPolicy $true -AllRequestOutOfPolicy $false  -DeleteSubject $false -AddOrganizerToSubject $false";
     }
@@ -75,14 +75,14 @@ function New-Resource {
     while($i -lt 10){
     try
     {
-        Add-MailboxPermission -Identity $windowsLiveID -AccessRights FullAccess -User $groupLiveID
+        Add-MailboxPermission -Identity $windowsLiveID -AccessRights FullAccess -User $groupLiveID -ErrorAction "Stop"
         Write-Output "FullAccess Granted."
         $i = 10;
     }
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Mailbox Permissions - Sleep Timer Started - On $i th iteration of 15 second breaks."
+        Write-Output "Mailbox Permissions - Sleep Timer Started - On $i th iteration of a 15 second break."
         $i++;
         $retry_mbperms = "Add-MailboxPermission -Identity $windowsLiveID -AccessRights FullAccess -User $groupLiveID";
     }
@@ -94,14 +94,14 @@ function New-Resource {
     try
     {
         $calendar = $windowsLiveID + ":\Calendar"
-        Add-MailboxFolderPermission -Identity $calendar -AccessRights Reviewer -User $groupLiveID
+        Add-MailboxFolderPermission -Identity $calendar -AccessRights Reviewer -User $groupLiveID -ErrorAction "Stop"
         Write-Output "Reviewer Access Granted."
         $i=10
     }
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Calendar Permissions - Sleep Timer Started - On $i th iteration of 15 second breaks."
+        Write-Output "Calendar Permissions - Sleep Timer Started - On $i th iteration of a 15 second break."
         $i++;
         $retry_calperms = "Add-MailboxFolderPermission -Identity $calendar -AccessRights Reviewer -User $groupLiveID";
     }
