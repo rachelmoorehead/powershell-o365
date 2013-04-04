@@ -64,7 +64,7 @@ function New-Resource {
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Calendar Processing - Sleep Timer Started - On $i th iteration of a 15 second break."
+        Write-Output "Calendar Processing - 15 Second Sleep Timer Started - On $i th iteration of 10."
         $i++;
         $retry_calproc = "Set-CalendarProcessing -Identity $windowsLiveID -ResourceDelegates $groupLiveID -BookInPolicy $groupLiveID -AutomateProcessing AutoAccept -ForwardRequestsToDelegates $true -TentativePendingApproval $true -AllowRecurringMeetings $true -AllowConflicts $true -AllBookInPolicy $false -AllRequestInPolicy $true -AllRequestOutOfPolicy $false  -DeleteSubject $false -AddOrganizerToSubject $false";
     }
@@ -82,7 +82,7 @@ function New-Resource {
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Mailbox Permissions - Sleep Timer Started - On $i th iteration of a 15 second break."
+        Write-Output "Mailbox Permissions - 15 Second Sleep Timer Started - On $i th iteration of 10."
         $i++;
         $retry_mbperms = "Add-MailboxPermission -Identity $windowsLiveID -AccessRights FullAccess -User $groupLiveID";
     }
@@ -101,7 +101,7 @@ function New-Resource {
     catch
     {
         Start-Sleep -Milliseconds 15000
-        Write-Output "Calendar Permissions - Sleep Timer Started - On $i th iteration of a 15 second break."
+        Write-Output "Calendar Permissions - 15 Second Sleep Timer Started - On $i th iteration of 10."
         $i++;
         $retry_calperms = "Add-MailboxFolderPermission -Identity $calendar -AccessRights Reviewer -User $groupLiveID";
     }
