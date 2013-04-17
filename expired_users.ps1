@@ -112,7 +112,7 @@ Write-Host "Start: $date"  >> $log
 
 $expired_date = $date.AddDays(-365)
 
-$users = Get-User -Filter "(RecipientType -eq 'UserMailbox') -and (WhenCreated -gt '$expired_date')" -ResultSize unlimited
+$users = Get-User -Filter "(RecipientType -eq 'UserMailbox') -and (WhenCreated -lt '$expired_date')" -ResultSize unlimited
 #$users
 
 $expired_users = Check-Expiration $users $expired_date
@@ -123,8 +123,8 @@ Write-Host "Expired Users Returned"
 $clean_users = Check-Rules $expired_users
 
 Write-Host "Clean Users Returned"
-#TODO Handle List Output for Action
-$clean_users |Format-Table | Out-File $results
+
+$clean_users |Format-Table -AutoSize | Out-File $results
 
 $date = Get-Date
 Write-Host "Completed: $date" >> $log
