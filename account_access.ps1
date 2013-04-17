@@ -1,9 +1,15 @@
 ﻿<#
 
-    .Description Functions to Lock and Unlock Accounts in Exchange Online to be used in coordination with regular account disablements.
+    .Description 
+    
+    Functions to Lock and Unlock Accounts in Exchange Online to be used in coordination with regular account disablements.
+    Functions to Impersonate and Un-impersonate a user.
 
     Lock-User
     Unlock-User
+
+    Add-Impersonation
+    Remove-Impersonation
 
 #>
 
@@ -59,4 +65,58 @@ function Unlock-User {
           Get-InboxRule -Mailbox $EmailAddress | Enable-InboxRule
           Write-Output "All Inbox Rules enabled."
           Write-Output "Perform a Password Re-Sync, if necessary. User will need to resetup ActiveSync devices and Connected Accounts, if necessary."
+}
+
+function Add-Impersonation{
+    param(
+            [parameter(Mandatory=$true,HelpMessage="Email address or UPN of user to be impersonated.")][string]$EmailAddress,
+            [parameter(Mandatory=$true,HelpMessage="Email address or UPN of user impersonating, if not yourself.")][string]$DelegateAddress
+    )
+
+        try{
+
+            Add-MailboxPermission -AccessRights FullAccess -Identity $EmailAddress -User $DelegateAddress -Confirm
+            [Environment]::SetEnvironmentVariable("O365Impersonate","$EmailAddress,$DelegateAddress","User")
+        }
+
+        catch{
+        
+            Write-Host "Sorry there was an error.  Please try again."
+        }
+        
+}
+
+function Remove-Impersonation{
+    param(
+            [parameter(ParameterSetName="Supplied",HelpMessage="Email address or UPN of mailbox")][string]$EmailAddress,
+            [parameter(ParameterSetName="Supplied",HelpMessage="Email address or UPN of delegate")][string]$DelegateAddress
+        )
+
+        if(($EmailAddress.Length -eq '0') -and ($DelegateAddress.Length -eq '0')){
+        
+            try{
+                $checkEnvVariable = [Environment]::GetEnvironmentVariable("O365Impersonate","User")
+                $temp = $checkEnvVariable.Split(',')
+                $EmailAddress = $temp[0]
+                $DelegateAddress = $temp[1]
+                [Environment]::GetEnvironmentVariable("O365Impersonate",$null,"User")
+            
+                Remove-MailboxPermission -AccessRights "FullAccess" -User $DelegateAddress -Identity $EmailAddress -Confirm
+            }
+            catch{
+            
+                Write-Host "Sorry there was an error.  Please try again."
+            }
+        }
+        else{
+        
+            try{
+                            
+                Remove-MailboxPermission -AccessRights "FullAccess" -User $DelegateAddress -Identity $EmailAddress -Confirm
+            }
+            catch{
+            
+                Write-Host "Sorry there was an error.  Please try again."
+            }
+        }
 }

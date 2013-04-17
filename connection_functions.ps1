@@ -3,7 +3,7 @@
 Note: Ideally added to Windows PowerShell Profile.
 
 Start-Session : Initiate a PS connection to Live@EDU or O365 and import in the O365 API (if required)
-End-Session   : End Current Session
+End-Session   : End Current Session, after checking for impersonation variables
 Switch-Tenant : Switch between Microsoft Environments (if multiple tenants, testing or production)
 
 #>
@@ -114,8 +114,43 @@ Function Start-Session {
 
 
 Function End-Session {
-    Get-PSSession | Remove-PSSession
-    exit
+
+    # Checks for Orphaned Impersonation Requests
+    #TODO Check for multiple variables
+    $temp = [Environment]::GetEnvironmentVariable("O365Impersonate","User")
+    if($temp.Length -eq '0'){
+    
+        Get-PSSession | Remove-PSSession
+        exit
+    
+    }
+    else {
+    
+        $confirm = Read-Host -Prompt "You have active impersonation rights still in place.  Would you like to remove this ($temp) before exiting? Yes or No"
+        if($confirm -eq 'Yes'){
+        
+            Remove-Impersonation
+            Get-PSSession | Remove-PSSession
+            exit 
+        
+        }
+        elseif($confirm -eq 'No'){
+        
+            Get-PSSession | Remove-PSSession
+            exit
+
+        }
+        else{
+        
+            Write-Host "Sorry, that is not a valid input.  Please retry your cmdlet."
+        
+        }
+
+    
+    }
+
+
+    
 }
 
 
